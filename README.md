@@ -4,6 +4,8 @@
 
 A personal post-installation script for **Arch Linux + Cinnamon**, written with the help of AI.
 
+This _could_ work with other DE too, especially other GTK-based ones. I have _not_ tested it with anything else other than Cinnamon, so YMMV.
+
 The script automates the setup of a fresh Arch Linux installation with useful applications, system utilities, multimedia codecs, hardware drivers, and desktop customizations.
 
 It is designed to be run as a normal user, not as root.
