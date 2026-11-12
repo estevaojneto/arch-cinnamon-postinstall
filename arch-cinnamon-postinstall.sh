@@ -303,8 +303,9 @@ sudo tee /etc/dconf/db/local.d/02-default-terminal >/dev/null <<'EOF'
 [org/cinnamon/desktop/default-applications/terminal]
 # The trailing space after -d is required: Nemo appends the current folder.
 exec='ptyxis --new-window -d '
-# Ptyxis uses --execute (or -x) to run commands passed by Nemo.
-exec-arg='--execute'
+# Keep this empty: Cinnamon appends exec-arg before the path/command.
+# A value such as "--" would be consumed as the -d directory argument.
+exec-arg=''
 EOF
 
 # Remove locks left by older versions of this script so users can override
