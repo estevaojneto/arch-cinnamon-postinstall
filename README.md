@@ -60,7 +60,7 @@ It is designed to be run as a normal user, not as root.
 - Optional VLC plugin bundle
 
 **Optional applications (interactive menu)**
-- Browsers: Vivaldi (plus its optional FFmpeg codec package), Google Chrome and LibreWolf (AUR, with Flatpak fallback).
+- Browsers: Vivaldi (installed together with its FFmpeg codecs), Google Chrome and LibreWolf (AUR, with Flatpak fallback).
 - Office: LibreOffice and the US English Hunspell dictionary.
 - Graphics: GIMP and Inkscape.
 - Communication: Discord.
