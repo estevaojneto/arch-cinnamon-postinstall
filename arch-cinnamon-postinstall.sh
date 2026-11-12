@@ -552,6 +552,7 @@ pac_opt vlc-plugins-all
 # --------------------------- applications ------------------------------------
 info "Office, graphics, chat"
 pac_try filezilla
+pac_try steam
 pac_try libreoffice-fresh hunspell-en_us
 pac_try gimp inkscape discord
 
