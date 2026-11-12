@@ -294,6 +294,13 @@ pac_try nemo-fileroller file-roller \
 pac_try xviewer gnome-calculator
 
 # Set Ptyxis as the system-wide default terminal through dconf.
+# This is equivalent to:
+#   gsettings set org.cinnamon.desktop.default-applications.terminal exec 'ptyxis --new-window -d '
+#   gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg ''
+# The trailing space after -d is intentional: Nemo appends the current folder,
+# allowing its right-click "Open in Terminal" action to open in that directory.
+# Keep exec-arg empty (also the Preferred Applications -> Terminal -> Arguments
+# field); a value such as "--" or "-e" would interfere with the directory path.
 # This is a system default, not a lock: users can override it in their own
 # GSettings preferences. New users and users without an override inherit it.
 info "Setting Ptyxis as the default Cinnamon terminal (user-overridable)"
@@ -301,10 +308,7 @@ ensure_dconf_profile
 
 sudo tee /etc/dconf/db/local.d/02-default-terminal >/dev/null <<'EOF'
 [org/cinnamon/desktop/default-applications/terminal]
-# The trailing space after -d is required: Nemo appends the current folder.
 exec='ptyxis --new-window -d '
-# Keep this empty: Cinnamon appends exec-arg before the path/command.
-# A value such as "--" would be consumed as the -d directory argument.
 exec-arg=''
 EOF
 
