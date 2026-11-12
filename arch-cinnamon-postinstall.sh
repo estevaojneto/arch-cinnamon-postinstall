@@ -293,20 +293,25 @@ pac_try nemo-fileroller file-roller \
 
 pac_try xviewer gnome-calculator
 
-# Set Ptyxis as Cinnamon's preferred terminal for the current user.
-# Cinnamon exposes this through its default-applications GSettings schema.
-info "Setting Ptyxis as the default Cinnamon terminal"
-if gsettings list-schemas | grep -qx 'org.cinnamon.desktop.default-applications.terminal' &&
-   gsettings list-keys org.cinnamon.desktop.default-applications.terminal | grep -qx 'exec'; then
-    gsettings set org.cinnamon.desktop.default-applications.terminal exec 'ptyxis' ||
-        fail "setting Ptyxis as Cinnamon's default terminal"
-    if gsettings list-keys org.cinnamon.desktop.default-applications.terminal | grep -qx 'exec-arg'; then
-        gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg '' ||
-            fail "clearing Cinnamon terminal arguments"
-    fi
-else
-    warn "Cinnamon terminal preference schema is unavailable in this session; set Ptyxis manually in Preferred Applications."
-fi
+# Set Ptyxis as Cinnamon's system-wide default terminal through dconf.
+# This provides the default to all users and locks the setting so per-user
+# GSettings overrides cannot silently switch Cinnamon back to another terminal.
+info "Setting Ptyxis as the system-wide Cinnamon default terminal"
+ensure_dconf_profile
+
+sudo tee /etc/dconf/db/local.d/02-default-terminal >/dev/null <<'EOF'
+[org/cinnamon/desktop/default-applications/terminal]
+exec='ptyxis'
+exec-arg=''
+EOF
+
+sudo mkdir -p /etc/dconf/db/local.d/locks
+sudo tee /etc/dconf/db/local.d/locks/02-default-terminal >/dev/null <<'EOF'
+/org/cinnamon/desktop/default-applications/terminal/exec
+/org/cinnamon/desktop/default-applications/terminal/exec-arg
+EOF
+
+sudo dconf update || fail "updating dconf with the system-wide Ptyxis terminal default"
 
 # --------------------- hardware, kernels + graphics ---------------------------
 info "Detecting CPU, GPUs and installed kernels"
