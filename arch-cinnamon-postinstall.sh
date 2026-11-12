@@ -301,8 +301,10 @@ ensure_dconf_profile
 
 sudo tee /etc/dconf/db/local.d/02-default-terminal >/dev/null <<'EOF'
 [org/cinnamon/desktop/default-applications/terminal]
-exec='ptyxis'
-exec-arg=''
+# The trailing space after -d is required: Nemo appends the current folder.
+exec='ptyxis --new-window -d '
+# Ptyxis uses --execute (or -x) to run commands passed by Nemo.
+exec-arg='--execute'
 EOF
 
 # Remove locks left by older versions of this script so users can override
