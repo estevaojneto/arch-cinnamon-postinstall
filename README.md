@@ -59,6 +59,7 @@ It is designed to be run as a normal user, not as root.
 
 **Desktop applications**
 - FileZilla (FTP/SFTP client)
+- Steam (native Arch package from Multilib; not Flatpak)
 - LibreOffice
 - GIMP
 - Inkscape
