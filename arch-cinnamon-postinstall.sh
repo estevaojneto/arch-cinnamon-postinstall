@@ -139,6 +139,80 @@ command -v yay >/dev/null || {
     exit 1
 }
 
+# ---------------------- optional application selection -----------------------
+# These are the only opt-in packages. Everything else in this script remains
+# mandatory (or hardware-/availability-conditional as documented below).
+OPTIONAL_ITEMS=(
+    "Vivaldi|vivaldi"
+    "Vivaldi FFmpeg codecs|vivaldi-ffmpeg-codecs"
+    "Google Chrome|google-chrome"
+    "LibreWolf|librewolf-bin"
+    "FileZilla|filezilla"
+    "Steam|steam"
+    "LibreOffice|libreoffice-fresh"
+    "US English dictionary|hunspell-en_us"
+    "GIMP|gimp"
+    "Inkscape|inkscape"
+    "Discord|discord"
+)
+declare -A OPTIONAL_SELECTED=()
+for item in "${OPTIONAL_ITEMS[@]}"; do
+    key="${item##*|}"
+    OPTIONAL_SELECTED["$key"]=1
+done
+
+show_optional_menu() {
+    local choice i label key state
+    while true; do
+        echo
+        echo "Optional applications (all selected by default):"
+        for i in "${!OPTIONAL_ITEMS[@]}"; do
+            label="${OPTIONAL_ITEMS[$i]%|*}"
+            key="${OPTIONAL_ITEMS[$i]##*|}"
+            if [[ "${OPTIONAL_SELECTED[$key]}" == 1 ]]; then
+                state="[x]"
+            else
+                state="[ ]"
+            fi
+            printf "  %2d) %s %s\\n" "$((i + 1))" "$state" "$label"
+        done
+        echo
+        echo "Enter a number to toggle an item, 'a' for all, 'n' for none, or 'd' when done."
+        read -rp "Selection: " choice
+        case "$choice" in
+            d|D|"") break ;;
+            a|A)
+                for item in "${OPTIONAL_ITEMS[@]}"; do
+                    OPTIONAL_SELECTED["${item##*|}"]=1
+                done
+                ;;
+            n|N)
+                for item in "${OPTIONAL_ITEMS[@]}"; do
+                    OPTIONAL_SELECTED["${item##*|}"]=0
+                done
+                ;;
+            *)
+                if [[ "$choice" =~ ^[0-9]+$ ]] &&
+                   (( choice >= 1 && choice <= ${#OPTIONAL_ITEMS[@]} )); then
+                    item="${OPTIONAL_ITEMS[$((choice - 1))]}"
+                    key="${item##*|}"
+                    if [[ "${OPTIONAL_SELECTED[$key]}" == 1 ]]; then
+                        OPTIONAL_SELECTED["$key"]=0
+                    else
+                        OPTIONAL_SELECTED["$key"]=1
+                    fi
+                else
+                    warn "Invalid selection."
+                fi
+                ;;
+        esac
+    done
+}
+
+show_optional_menu
+LIBREWOLF_FLATPAK=false
+
+
 # --------------------------- system essentials -------------------------------
 info "Filesystem/device support and tools"
 pac_try gvfs gvfs-mtp gvfs-smb gvfs-afc ntfs-3g gnome-keyring
@@ -573,27 +647,63 @@ pac_try vlc ffmpeg gst-plugins-base gst-plugins-good \
     gst-plugins-bad gst-plugins-ugly gst-libav
 pac_opt vlc-plugins-all
 
-# --------------------------- applications ------------------------------------
-info "Office, graphics, chat"
-pac_try filezilla
-pac_try steam
-pac_try libreoffice-fresh hunspell-en_us
-pac_try gimp inkscape discord
+# --------------------------- optional applications ---------------------------
+if [[ "${OPTIONAL_SELECTED[filezilla]}" == 1 ]]; then
+    info "FileZilla"
+    pac_try filezilla
+fi
 
-info "Vivaldi"
-pac_try vivaldi
-pac_opt vivaldi-ffmpeg-codecs
+if [[ "${OPTIONAL_SELECTED[steam]}" == 1 ]]; then
+    info "Steam (native package)"
+    pac_try steam
+fi
 
-info "Google Chrome (AUR)"
-aur_try google-chrome
+if [[ "${OPTIONAL_SELECTED[libreoffice-fresh]}" == 1 ]]; then
+    info "LibreOffice"
+    pac_try libreoffice-fresh
+fi
 
-info "LibreWolf (AUR, Flatpak fallback)"
+if [[ "${OPTIONAL_SELECTED[hunspell-en_us]}" == 1 ]]; then
+    info "US English dictionary"
+    pac_try hunspell-en_us
+fi
 
-if ! aur librewolf-bin; then
-    warn "LibreWolf AUR build failed, falling back to Flatpak"
-    LIBREWOLF_FLATPAK=true
-else
-    LIBREWOLF_FLATPAK=false
+if [[ "${OPTIONAL_SELECTED[gimp]}" == 1 ]]; then
+    info "GIMP"
+    pac_try gimp
+fi
+
+if [[ "${OPTIONAL_SELECTED[inkscape]}" == 1 ]]; then
+    info "Inkscape"
+    pac_try inkscape
+fi
+
+if [[ "${OPTIONAL_SELECTED[discord]}" == 1 ]]; then
+    info "Discord"
+    pac_try discord
+fi
+
+if [[ "${OPTIONAL_SELECTED[vivaldi]}" == 1 ]]; then
+    info "Vivaldi"
+    pac_try vivaldi
+fi
+
+if [[ "${OPTIONAL_SELECTED[vivaldi-ffmpeg-codecs]}" == 1 ]]; then
+    info "Vivaldi FFmpeg codecs"
+    pac_opt vivaldi-ffmpeg-codecs
+fi
+
+if [[ "${OPTIONAL_SELECTED[google-chrome]}" == 1 ]]; then
+    info "Google Chrome (AUR)"
+    aur_try google-chrome
+fi
+
+if [[ "${OPTIONAL_SELECTED[librewolf-bin]}" == 1 ]]; then
+    info "LibreWolf (AUR, Flatpak fallback)"
+    if ! aur librewolf-bin; then
+        warn "LibreWolf AUR build failed, falling back to Flatpak"
+        LIBREWOLF_FLATPAK=true
+    fi
 fi
 
 # --------------------------- Flatpak -----------------------------------------
