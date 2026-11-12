@@ -143,8 +143,7 @@ command -v yay >/dev/null || {
 # These are the only opt-in packages. Everything else in this script remains
 # mandatory (or hardware-/availability-conditional as documented below).
 OPTIONAL_ITEMS=(
-    "Vivaldi|vivaldi"
-    "Vivaldi FFmpeg codecs|vivaldi-ffmpeg-codecs"
+    "Vivaldi (with FFmpeg codecs)|vivaldi"
     "Google Chrome|google-chrome"
     "LibreWolf|librewolf-bin"
     "FileZilla|filezilla"
@@ -684,12 +683,8 @@ if [[ "${OPTIONAL_SELECTED[discord]}" == 1 ]]; then
 fi
 
 if [[ "${OPTIONAL_SELECTED[vivaldi]}" == 1 ]]; then
-    info "Vivaldi"
+    info "Vivaldi (including FFmpeg codecs)"
     pac_try vivaldi
-fi
-
-if [[ "${OPTIONAL_SELECTED[vivaldi-ffmpeg-codecs]}" == 1 ]]; then
-    info "Vivaldi FFmpeg codecs"
     pac_opt vivaldi-ffmpeg-codecs
 fi
 
