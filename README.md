@@ -63,7 +63,7 @@ It is designed to be run as a normal user, not as root.
 - Browsers: Vivaldi (installed together with its FFmpeg codecs), Google Chrome and LibreWolf (AUR, with Flatpak fallback).
 - Office: LibreOffice and the US English Hunspell dictionary.
 - Graphics: GIMP and Inkscape.
-- Communication: Discord.
+- Communication: Discord and Telegram Desktop (`telegram-desktop`).
 - Other desktop apps: FileZilla and Steam (native Arch package from Multilib; not Flatpak).
 
 All optional applications are selected by default. Before installation, an interactive menu lets you toggle individual entries, select all, deselect all, or continue. Skipped applications are not installed. The system utilities, Cinnamon components, fonts, Spicy Clipboard Manager, VLC and media codecs, hardware-dependent drivers, Pamac, Flatpak, Tailscale and desktop configuration remain mandatory or conditional as appropriate.
