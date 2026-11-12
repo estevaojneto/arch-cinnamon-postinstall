@@ -27,6 +27,7 @@ It is designed to be run as a normal user, not as root.
 - `ntfs-3g`, `gnome-keyring`
 - `xdg-utils`, `dconf`, `pavucontrol`
 - `flatpak`, `tailscale`
+- `snapd` (installed as a Pamac dependency; `snapd.socket` is enabled)
 
 **Cinnamon applications and applets**
 - Nemo extensions and file roller
@@ -67,6 +68,14 @@ It is designed to be run as a normal user, not as root.
 - Vivaldi
 - Google Chrome
 - LibreWolf (AUR, with Flatpak fallback)
+- Pamac (`pamac-all` from the AUR), with support for official repositories, AUR, Flatpak and Snap
+
+### Pamac and software sources
+
+- Installs `pamac-all` from the AUR, providing integration for official Arch repositories, AUR, Flatpak and Snap.
+- Enables AUR support and AUR update checks in `/etc/pamac.conf`.
+- Enables the socket-activated Snap daemon with `snapd.socket` and creates `/snap` for classic Snap packages when that path does not already exist.
+- Removes conflicting older Pamac frontend/library packages installed by earlier versions of this script before installing `pamac-all`.
 
 ### Hardware detection and drivers
 
