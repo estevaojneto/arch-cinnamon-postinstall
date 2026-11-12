@@ -166,6 +166,120 @@ info "Tailscale"
 pac_try tailscale
 sudo systemctl enable --now tailscaled.service || fail "tailscaled service"
 
+# ---------------------- Spicy Clipboard Manager ------------------------------
+info "Installing Spicy Clipboard Manager Cinnamon applet"
+
+# Spicy Clipboard Manager is a Cinnamon Spices applet, not an Arch package.
+# yad provides its history/editor dialogs; xclip provides X11 clipboard and
+# image support. No Wayland-specific tooling is needed for this X11 setup.
+pac_try yad xclip
+
+install_spicy_clipboard_applet() {
+    local uuid="spicy-clipboard-applet@Twilight0"
+    local url="https://cinnamon-spices.linuxmint.com/files/applets/spicy-clipboard-applet%40Twilight0.zip"
+    local tmpz tmpd target
+
+    tmpz=$(mktemp --suffix=.zip) || return 1
+    tmpd=$(mktemp -d) || {
+        rm -f "$tmpz"
+        return 1
+    }
+    target="$HOME/.local/share/cinnamon/applets/$uuid"
+
+    if ! curl -fL "$url" -o "$tmpz" ||
+       ! unzip -oq "$tmpz" -d "$tmpd" ||
+       [[ ! -f "$tmpd/$uuid/metadata.json" ]]; then
+        rm -rf "$tmpz" "$tmpd"
+        fail "could not download or validate Spicy Clipboard Manager"
+        return 1
+    fi
+
+    mkdir -p "$target" || {
+        rm -rf "$tmpz" "$tmpd"
+        fail "could not create Cinnamon applet directory"
+        return 1
+    }
+
+    cp -a "$tmpd/$uuid/." "$target/" || {
+        rm -rf "$tmpz" "$tmpd"
+        fail "could not install Spicy Clipboard Manager files"
+        return 1
+    }
+
+    rm -rf "$tmpz" "$tmpd"
+    info "Spicy Clipboard Manager installed for user $USER"
+}
+
+if install_spicy_clipboard_applet; then
+    # Cinnamon stores applet placement in org.cinnamon/enabled-applets.
+    # Put this applet first in panel1's right-hand zone (the tray side), while
+    # preserving the relative order of the other right-side applets.
+    if command -v gsettings >/dev/null &&
+       gsettings list-schemas | grep -qx 'org.cinnamon'; then
+        if python3 - <<'PY'
+import ast
+import subprocess
+import sys
+
+schema = "org.cinnamon"
+key = "enabled-applets"
+uuid = "spicy-clipboard-applet@Twilight0"
+
+try:
+    raw = subprocess.check_output(
+        ["gsettings", "get", schema, key], text=True
+    ).strip()
+    entries = ast.literal_eval(raw)
+    if not isinstance(entries, list) or not all(isinstance(x, str) for x in entries):
+        raise ValueError("unexpected enabled-applets value")
+
+    right_side = []
+    kept = []
+    for entry in entries:
+        fields = entry.split(":")
+        if len(fields) >= 5 and fields[3] == uuid:
+            continue
+        if len(fields) >= 5 and fields[0] == "panel1" and fields[1] == "right":
+            try:
+                order = int(fields[2])
+            except ValueError:
+                order = 10**9
+            right_side.append((order, entry, fields))
+        else:
+            kept.append(entry)
+
+    # Keep existing right-zone applets in their current order, shifting them
+    # one position to make room for Spicy Clipboard at order zero.
+    right_side.sort(key=lambda item: item[0])
+    shifted = []
+    for new_order, (_, _, fields) in enumerate(right_side, start=1):
+        fields[2] = str(new_order)
+        shifted.append(":".join(fields))
+
+    new_entry = f"panel1:right:0:{uuid}:0"
+    updated = kept + [new_entry] + shifted
+
+    subprocess.run(
+        ["gsettings", "set", schema, key, repr(updated)],
+        check=True
+    )
+    print("Spicy Clipboard Manager placed first in panel1's right zone.")
+except Exception as exc:
+    print(f"Could not configure Cinnamon panel placement: {exc}", file=sys.stderr)
+    sys.exit(1)
+PY
+        then
+            :
+        else
+            warn "Spicy Clipboard Manager is installed, but panel placement could not be configured. Add it through System Settings -> Applets."
+        fi
+    else
+        warn "Cinnamon settings are unavailable in this session; add Spicy Clipboard Manager to the panel after logging in."
+    fi
+else
+    warn "Spicy Clipboard Manager installation did not complete."
+fi
+
 # --------------------------- fonts -------------------------------------------
 info "Fonts"
 pac_try noto-fonts noto-fonts-emoji noto-fonts-cjk \
