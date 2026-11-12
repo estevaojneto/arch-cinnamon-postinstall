@@ -112,6 +112,26 @@ fi
 info "Full system upgrade"
 sudo pacman -Syu --noconfirm || fail "system upgrade"
 
+# ------------------------ periodic filesystem TRIM ---------------------------
+info "Enabling periodic filesystem TRIM"
+
+# util-linux provides fstrim.service and fstrim.timer on Arch.
+# Restore the package if either systemd unit is missing.
+if ! systemctl cat fstrim.timer &>/dev/null ||
+   ! systemctl cat fstrim.service &>/dev/null; then
+    info "fstrim systemd units are missing; installing/reinstalling util-linux"
+    sudo pacman -S --noconfirm util-linux ||
+        fail "installing util-linux for fstrim"
+fi
+
+if systemctl cat fstrim.timer &>/dev/null &&
+   systemctl cat fstrim.service &>/dev/null; then
+    sudo systemctl enable --now fstrim.timer ||
+        fail "enabling fstrim.timer"
+else
+    fail "fstrim.timer or fstrim.service is unavailable after installing util-linux"
+fi
+
 # --------------------------- base tooling ------------------------------------
 info "Installing build tools"
 pac_try base-devel git curl unzip pciutils
