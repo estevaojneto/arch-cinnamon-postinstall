@@ -587,13 +587,13 @@ if $LIBREWOLF_FLATPAK; then
 fi
 
 # --------------------------- Pamac -------------------------------------------
-info "Pamac (software center)"
+info "Pamac (software center: AUR + Flatpak + Snap)"
 
-# Remove the AUR-only library and frontend together.
+# Remove older Pamac frontends/libraries before installing pamac-all.
 # Do not use -Rdd: normal dependency resolution is safer.
 old_pamac=()
 
-for p in pamac-aur libpamac-aur; do
+for p in pamac-aur libpamac-aur pamac-flatpak libpamac-flatpak; do
     if pacman -Qq "$p" &>/dev/null; then
         old_pamac+=("$p")
     fi
@@ -601,24 +601,40 @@ done
 
 pamac_ready=true
 
-if ((${#old_pamac[@]})); then
+if (("${#old_pamac[@]}")); then
     if sudo pacman -R --noconfirm "${old_pamac[@]}"; then
-        info "Removed conflicting Pamac AUR packages"
+        info "Removed conflicting older Pamac packages"
     else
-        fail "removing old Pamac packages; skipping pamac-flatpak"
+        fail "removing old Pamac packages; skipping pamac-all"
         pamac_ready=false
     fi
 fi
 
-# Only install/configure the replacement after the conflicting packages
-# have been removed and the new package has installed successfully.
+# pamac-all provides integration for official repositories, AUR, Flatpak and Snap.
+# Its dependencies include the Snap daemon.
 if $pamac_ready; then
-    if aur pamac-flatpak; then
-        info "pamac-flatpak installed"
+    if aur pamac-all; then
+        info "pamac-all installed"
     else
-        fail "AUR: pamac-flatpak"
+        fail "AUR: pamac-all"
         pamac_ready=false
     fi
+fi
+
+# Enable Snap's socket-activated daemon when the package is installed.
+if $pamac_ready && pacman -Qq snapd &>/dev/null; then
+    sudo systemctl enable --now snapd.socket ||
+        fail "enabling snapd.socket"
+
+    # This conventional path is needed by some classic Snaps.
+    if [[ ! -e /snap && ! -L /snap ]]; then
+        sudo ln -s /var/lib/snapd/snap /snap ||
+            fail "creating /snap symlink"
+    elif [[ -L /snap ]] && [[ "$(readlink /snap)" != "/var/lib/snapd/snap" ]]; then
+        warn "/snap already points elsewhere; leaving it unchanged"
+    fi
+else
+    warn "Snap daemon was not installed with pamac-all; Snap integration may be unavailable"
 fi
 
 # Enable AUR support only when the replacement frontend is available.
