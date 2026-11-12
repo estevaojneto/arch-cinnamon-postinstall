@@ -601,7 +601,7 @@ done
 
 pamac_ready=true
 
-if (("${#old_pamac[@]}")); then
+if ((${#old_pamac[@]})); then
     if sudo pacman -R --noconfirm "${old_pamac[@]}"; then
         info "Removed conflicting older Pamac packages"
     else
