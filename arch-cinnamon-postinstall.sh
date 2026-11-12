@@ -153,6 +153,7 @@ OPTIONAL_ITEMS=(
     "GIMP|gimp"
     "Inkscape|inkscape"
     "Discord|discord"
+    "Telegram|telegram-desktop"
 )
 declare -A OPTIONAL_SELECTED=()
 for item in "${OPTIONAL_ITEMS[@]}"; do
@@ -680,6 +681,11 @@ fi
 if [[ "${OPTIONAL_SELECTED[discord]}" == 1 ]]; then
     info "Discord"
     pac_try discord
+fi
+
+if [[ "${OPTIONAL_SELECTED[telegram-desktop]}" == 1 ]]; then
+    info "Telegram"
+    pac_try telegram-desktop
 fi
 
 if [[ "${OPTIONAL_SELECTED[vivaldi]}" == 1 ]]; then
