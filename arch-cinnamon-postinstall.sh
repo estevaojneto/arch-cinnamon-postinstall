@@ -172,7 +172,7 @@ info "Installing Spicy Clipboard Manager Cinnamon applet"
 # Spicy Clipboard Manager is a Cinnamon Spices applet, not an Arch package.
 # yad provides its history/editor dialogs; xclip provides X11 clipboard and
 # image support. No Wayland-specific tooling is needed for this X11 setup.
-pac_try yad xclip
+pac_try yad xclip python
 
 install_spicy_clipboard_applet() {
     local uuid="spicy-clipboard-applet@Twilight0"
