@@ -58,6 +58,7 @@ It is designed to be run as a normal user, not as root.
 - Optional VLC plugin bundle
 
 **Desktop applications**
+- FileZilla (FTP/SFTP client)
 - LibreOffice
 - GIMP
 - Inkscape
