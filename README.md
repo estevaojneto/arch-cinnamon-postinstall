@@ -31,7 +31,8 @@ It is designed to be run as a normal user, not as root.
 
 **Cinnamon applications and applets**
 - Nemo extensions and file roller
-- GNOME Terminal
+- Sets Ptyxis as Cinnamon's preferred terminal for the current user through GSettings.
+- Ptyxis (default Cinnamon terminal; GNOME Terminal is not installed)
 - Xed and Xreader
 - GNOME System Monitor
 - GNOME Disk Utility and GParted
