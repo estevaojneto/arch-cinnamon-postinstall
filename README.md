@@ -28,7 +28,7 @@ It is designed to be run as a normal user, not as root.
 - `xdg-utils`, `dconf`, `pavucontrol`
 - `flatpak`, `tailscale`
 
-**Cinnamon applications**
+**Cinnamon applications and applets**
 - Nemo extensions and file roller
 - GNOME Terminal
 - Xed and Xreader
@@ -36,6 +36,13 @@ It is designed to be run as a normal user, not as root.
 - GNOME Disk Utility and GParted
 - GNOME Screenshot
 - Xviewer and GNOME Calculator
+- Spicy Clipboard Manager Cinnamon applet
+
+**Spicy Clipboard Manager**
+- Downloads and installs the applet from Cinnamon Spices for the current user.
+- Installs its `yad`, `xclip` and `python` dependencies.
+- Enables the applet and places it first in the right-hand zone of `panel1`, shifting existing applets in that zone to make room.
+- If automatic panel configuration fails, the applet can be added manually through **System Settings → Applets**.
 
 **Fonts**
 - Noto Fonts
