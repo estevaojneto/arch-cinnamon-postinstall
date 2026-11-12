@@ -31,7 +31,7 @@ It is designed to be run as a normal user, not as root.
 
 **Cinnamon applications and applets**
 - Nemo extensions and file roller
-- Sets Ptyxis as the system-wide default Cinnamon terminal through dconf. Users can override it in their own preferences; new users and users without an override inherit Ptyxis.
+- Sets Ptyxis as the system-wide default Cinnamon terminal through dconf, using `ptyxis --new-window -d ` so Nemo's **Open in Terminal** action opens the current folder. Sets `exec-arg` to `--execute` for command execution. Users can override these defaults in their own preferences; new users and users without an override inherit them.
 - Ptyxis (default Cinnamon terminal; GNOME Terminal is not installed)
 - Xed and Xreader
 - GNOME System Monitor
