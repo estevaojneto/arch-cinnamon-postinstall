@@ -288,10 +288,25 @@ pac_try noto-fonts noto-fonts-emoji noto-fonts-cjk \
 # --------------------------- Cinnamon companions -----------------------------
 info "Cinnamon companion apps"
 pac_try nemo-fileroller file-roller \
-    gnome-terminal xed xreader \
+    ptyxis xed xreader \
     gnome-system-monitor gnome-disk-utility gparted gnome-screenshot
 
 pac_try xviewer gnome-calculator
+
+# Set Ptyxis as Cinnamon's preferred terminal for the current user.
+# Cinnamon exposes this through its default-applications GSettings schema.
+info "Setting Ptyxis as the default Cinnamon terminal"
+if gsettings list-schemas | grep -qx 'org.cinnamon.desktop.default-applications.terminal' &&
+   gsettings list-keys org.cinnamon.desktop.default-applications.terminal | grep -qx 'exec'; then
+    gsettings set org.cinnamon.desktop.default-applications.terminal exec 'ptyxis' ||
+        fail "setting Ptyxis as Cinnamon's default terminal"
+    if gsettings list-keys org.cinnamon.desktop.default-applications.terminal | grep -qx 'exec-arg'; then
+        gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg '' ||
+            fail "clearing Cinnamon terminal arguments"
+    fi
+else
+    warn "Cinnamon terminal preference schema is unavailable in this session; set Ptyxis manually in Preferred Applications."
+fi
 
 # --------------------- hardware, kernels + graphics ---------------------------
 info "Detecting CPU, GPUs and installed kernels"
