@@ -59,17 +59,17 @@ It is designed to be run as a normal user, not as root.
 - GStreamer plugins: Base, Good, Bad, Ugly and Libav
 - Optional VLC plugin bundle
 
-**Desktop applications**
-- FileZilla (FTP/SFTP client)
-- Steam (native Arch package from Multilib; not Flatpak)
-- LibreOffice
-- GIMP
-- Inkscape
-- Discord
-- Vivaldi
-- Google Chrome
-- LibreWolf (AUR, with Flatpak fallback)
-- Pamac (`pamac-all` from the AUR), with support for official repositories, AUR, Flatpak and Snap
+**Optional applications (interactive menu)**
+- Browsers: Vivaldi (plus its optional FFmpeg codec package), Google Chrome and LibreWolf (AUR, with Flatpak fallback).
+- Office: LibreOffice and the US English Hunspell dictionary.
+- Graphics: GIMP and Inkscape.
+- Communication: Discord.
+- Other desktop apps: FileZilla and Steam (native Arch package from Multilib; not Flatpak).
+
+All optional applications are selected by default. Before installation, an interactive menu lets you toggle individual entries, select all, deselect all, or continue. Skipped applications are not installed. The system utilities, Cinnamon components, fonts, Spicy Clipboard Manager, VLC and media codecs, hardware-dependent drivers, Pamac, Flatpak, Tailscale and desktop configuration remain mandatory or conditional as appropriate.
+
+**Software management**
+- Pamac (`pamac-all` from the AUR), with support for official repositories, AUR, Flatpak and Snap.
 
 ### Pamac and software sources
 
@@ -147,7 +147,7 @@ Run it as your normal user:
 
 Do **not** run it with `sudo`. The script requests administrative privileges when needed.
 
-You may be prompted to select an NVIDIA driver and whether to reboot at the end.
+You can choose which optional applications to install in the interactive menu. All are selected by default. You may also be prompted to select an NVIDIA driver and whether to reboot at the end.
 
 ## Configuration
 
