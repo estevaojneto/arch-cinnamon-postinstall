@@ -293,10 +293,10 @@ pac_try nemo-fileroller file-roller \
 
 pac_try xviewer gnome-calculator
 
-# Set Ptyxis as Cinnamon's system-wide default terminal through dconf.
-# This provides the default to all users and locks the setting so per-user
-# GSettings overrides cannot silently switch Cinnamon back to another terminal.
-info "Setting Ptyxis as the system-wide Cinnamon default terminal"
+# Set Ptyxis as the system-wide default terminal through dconf.
+# This is a system default, not a lock: users can override it in their own
+# GSettings preferences. New users and users without an override inherit it.
+info "Setting Ptyxis as the default Cinnamon terminal (user-overridable)"
 ensure_dconf_profile
 
 sudo tee /etc/dconf/db/local.d/02-default-terminal >/dev/null <<'EOF'
@@ -305,12 +305,9 @@ exec='ptyxis'
 exec-arg=''
 EOF
 
-sudo mkdir -p /etc/dconf/db/local.d/locks
-sudo tee /etc/dconf/db/local.d/locks/02-default-terminal >/dev/null <<'EOF'
-/org/cinnamon/desktop/default-applications/terminal/exec
-/org/cinnamon/desktop/default-applications/terminal/exec-arg
-EOF
-
+# Remove locks left by older versions of this script so users can override
+# the system default again.
+sudo rm -f /etc/dconf/db/local.d/locks/02-default-terminal
 sudo dconf update || fail "updating dconf with the system-wide Ptyxis terminal default"
 
 # --------------------- hardware, kernels + graphics ---------------------------
