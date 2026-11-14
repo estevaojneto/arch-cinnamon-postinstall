@@ -26,6 +26,8 @@ It is designed to be run as a normal user, not as root.
 - `gvfs`, `gvfs-mtp`, `gvfs-smb`, `gvfs-afc`
 - `ntfs-3g`, `gnome-keyring`
 - `xdg-utils`, `dconf`, `pavucontrol`, `xorg-xdpyinfo`, `xorg-xinput`
+- Printer support: `usbutils`, `cups`, `cups-filters`, `system-config-printer`, `avahi`, `nss-mdns`
+- Enables `cups.service` for printing and `avahi-daemon.service` for network-printer service discovery.
 - `flatpak`, `tailscale`
 - `snapd` (installed as a Pamac dependency; `snapd.socket` is enabled)
 - `xorg-xdpyinfo`, `xorg-xinput`
