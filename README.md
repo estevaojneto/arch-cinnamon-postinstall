@@ -25,9 +25,10 @@ It is designed to be run as a normal user, not as root.
 - `base-devel`, `git`, `curl`, `unzip`, `pciutils`
 - `gvfs`, `gvfs-mtp`, `gvfs-smb`, `gvfs-afc`
 - `ntfs-3g`, `gnome-keyring`
-- `xdg-utils`, `dconf`, `pavucontrol`
+- `xdg-utils`, `dconf`, `pavucontrol`, `xorg-xdpyinfo`, `xorg-xinput`
 - `flatpak`, `tailscale`
 - `snapd` (installed as a Pamac dependency; `snapd.socket` is enabled)
+- `xorg-xdpyinfo`, `xorg-xinput`
 
 **Cinnamon applications and applets**
 - Nemo extensions and file roller
@@ -64,7 +65,7 @@ It is designed to be run as a normal user, not as root.
 - Office: LibreOffice and the US English Hunspell dictionary.
 - Graphics: GIMP and Inkscape.
 - Communication: Discord and Telegram Desktop (`telegram-desktop`).
-- Other desktop apps: FileZilla and Steam (native Arch package from Multilib; not Flatpak).
+- Other desktop apps: FileZilla and Steam (Snap preferred, native Arch package from Multilib as the second choice, and Flatpak as the last fallback).
 
 All optional applications are selected by default. Before installation, an interactive menu lets you toggle individual entries, select all, deselect all, or continue. Skipped applications are not installed. The system utilities, Cinnamon components, fonts, Spicy Clipboard Manager, VLC and media codecs, hardware-dependent drivers, Pamac, Flatpak, Tailscale and desktop configuration remain mandatory or conditional as appropriate.
 
