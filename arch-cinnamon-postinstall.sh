@@ -138,10 +138,57 @@ pac_try base-devel git curl unzip pciutils
 
 # ------------------------- printer support -----------------------------------
 info "Installing printer and network printer support"
-pac_try usbutils cups cups-filters system-config-printer avahi nss-mdns
+pac_try usbutils cups cups-filters cups-browsed system-config-printer avahi nss-mdns
 
-# CUPS handles printing; Avahi provides network service discovery used by
-# many network printers. Enable both services when their units are available.
+# nss-mdns must be enabled in NSS; installing the package alone does not make
+# Avahi-discovered .local printer hostnames resolvable by CUPS.
+if [[ -f /etc/nsswitch.conf ]] &&
+   grep -Eq '^[[:space:]]*hosts:' /etc/nsswitch.conf; then
+    if ! awk '
+        $1 == "hosts:" {
+            for (i = 1; i <= NF; i++) {
+                if ($i == "mdns_minimal") found = 1
+            }
+        }
+        END { exit !found }
+    ' /etc/nsswitch.conf; then
+        if grep -Eq '^[[:space:]]*hosts:.*[[:space:]]resolve([[:space:]]|$)' /etc/nsswitch.conf; then
+            sudo sed -i -E \
+                '/^[[:space:]]*hosts:/ s/[[:space:]]resolve([[:space:]]|$)/ mdns_minimal [NOTFOUND=return] resolve\1/' \
+                /etc/nsswitch.conf ||
+                fail "configuring mdns_minimal in /etc/nsswitch.conf"
+        elif grep -Eq '^[[:space:]]*hosts:.*[[:space:]]dns([[:space:]]|$)' /etc/nsswitch.conf; then
+            sudo sed -i -E \
+                '/^[[:space:]]*hosts:/ s/[[:space:]]dns([[:space:]]|$)/ mdns_minimal [NOTFOUND=return] dns\1/' \
+                /etc/nsswitch.conf ||
+                fail "configuring mdns_minimal in /etc/nsswitch.conf"
+        else
+            sudo sed -i -E \
+                '/^[[:space:]]*hosts:/ s/[[:space:]]*$/ mdns_minimal [NOTFOUND=return]/' \
+                /etc/nsswitch.conf ||
+                fail "configuring mdns_minimal in /etc/nsswitch.conf"
+        fi
+    fi
+else
+    fail "/etc/nsswitch.conf is missing or has no hosts entry"
+fi
+
+# Let cups-browsed create queues for IPP printers advertised on the network.
+# The default LocalOnly setting does not create queues for remote network
+# printers. All also covers printers advertising non-driverless IPP formats.
+if sudo install -Dm644 /dev/null /etc/cups/cups-browsed.conf; then
+    sudo sed -i -E \
+        '/^[[:space:]]*CreateIPPPrinterQueues([[:space:]]|$)/d' \
+        /etc/cups/cups-browsed.conf &&
+        printf '%s\n' 'CreateIPPPrinterQueues All' |
+            sudo tee -a /etc/cups/cups-browsed.conf >/dev/null ||
+        fail "configuring automatic IPP queue creation in cups-browsed.conf"
+else
+    fail "creating /etc/cups/cups-browsed.conf"
+fi
+
+# CUPS handles printing, Avahi discovers network services, and cups-browsed
+# creates local queues for the IPP printers advertised by those services.
 if systemctl cat cups.service &>/dev/null; then
     sudo systemctl enable --now cups.service ||
         fail "enabling cups.service"
@@ -154,6 +201,13 @@ if systemctl cat avahi-daemon.service &>/dev/null; then
         fail "enabling avahi-daemon.service"
 else
     fail "avahi-daemon.service is unavailable after installing Avahi"
+fi
+
+if systemctl cat cups-browsed.service &>/dev/null; then
+    sudo systemctl enable --now cups-browsed.service ||
+        fail "enabling cups-browsed.service"
+else
+    fail "cups-browsed.service is unavailable after installing cups-browsed"
 fi
 
 # --------------------------- yay ---------------------------------------------
