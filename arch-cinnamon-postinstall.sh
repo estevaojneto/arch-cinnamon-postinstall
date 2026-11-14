@@ -136,6 +136,26 @@ fi
 info "Installing build tools"
 pac_try base-devel git curl unzip pciutils
 
+# ------------------------- printer support -----------------------------------
+info "Installing printer and network printer support"
+pac_try usbutils cups cups-filters system-config-printer avahi nss-mdns
+
+# CUPS handles printing; Avahi provides network service discovery used by
+# many network printers. Enable both services when their units are available.
+if systemctl cat cups.service &>/dev/null; then
+    sudo systemctl enable --now cups.service ||
+        fail "enabling cups.service"
+else
+    fail "cups.service is unavailable after installing CUPS"
+fi
+
+if systemctl cat avahi-daemon.service &>/dev/null; then
+    sudo systemctl enable --now avahi-daemon.service ||
+        fail "enabling avahi-daemon.service"
+else
+    fail "avahi-daemon.service is unavailable after installing Avahi"
+fi
+
 # --------------------------- yay ---------------------------------------------
 if ! command -v yay >/dev/null; then
     info "Bootstrapping yay"
