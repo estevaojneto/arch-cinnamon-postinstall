@@ -26,8 +26,10 @@ It is designed to be run as a normal user, not as root.
 - `gvfs`, `gvfs-mtp`, `gvfs-smb`, `gvfs-afc`
 - `ntfs-3g`, `gnome-keyring`
 - `xdg-utils`, `dconf`, `pavucontrol`, `xorg-xdpyinfo`, `xorg-xinput`
-- Printer support: `usbutils`, `cups`, `cups-filters`, `system-config-printer`, `avahi`, `nss-mdns`
-- Enables `cups.service` for printing and `avahi-daemon.service` for network-printer service discovery.
+- Printer support: `usbutils`, `cups`, `cups-filters`, `cups-browsed`, `system-config-printer`, `avahi`, `nss-mdns`.
+- Enables `cups.service`, `avahi-daemon.service` and `cups-browsed.service`.
+- Configures `nss-mdns` in `/etc/nsswitch.conf`, adding `mdns_minimal [NOTFOUND=return]` before `resolve` (or `dns`) so CUPS can resolve printer hostnames discovered through Avahi.
+- Configures `cups-browsed` with `CreateIPPPrinterQueues All` to automatically create queues for IPP printers advertised on the network.
 - `flatpak`, `tailscale`
 - `snapd` (installed as a Pamac dependency; `snapd.socket` is enabled)
 - `xorg-xdpyinfo`, `xorg-xinput`
