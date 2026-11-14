@@ -248,7 +248,7 @@ if systemctl is-enabled --quiet bluetooth.service 2>/dev/null; then
 fi
 
 info "Utilities"
-pac_try xorg-xdpyinfo
+pac_try xorg-xdpyinfo xorg-xinput
 
 if pacman -Si neofetch &>/dev/null; then
     pac_try neofetch
@@ -673,11 +673,6 @@ if [[ "${OPTIONAL_SELECTED[filezilla]}" == 1 ]]; then
     pac_try filezilla
 fi
 
-if [[ "${OPTIONAL_SELECTED[steam]}" == 1 ]]; then
-    info "Steam (native package)"
-    pac_try steam
-fi
-
 if [[ "${OPTIONAL_SELECTED[libreoffice-fresh]}" == 1 ]]; then
     info "LibreOffice"
     pac_try libreoffice-fresh
@@ -790,6 +785,49 @@ if $pamac_ready && pacman -Qq snapd &>/dev/null; then
     fi
 else
     warn "Snap daemon was not installed with pamac-all; Snap integration may be unavailable"
+fi
+
+# Steam prefers the Snap package, then the native Multilib package, and finally
+# the Flathub build. Keep this after Snap and Flatpak setup so each fallback is
+# available before it is attempted.
+if [[ "${OPTIONAL_SELECTED[steam]}" == 1 ]]; then
+    info "Steam (Snap -> native Arch package -> Flatpak fallback)"
+    steam_installed=false
+
+    if command -v snap >/dev/null && pacman -Qq snapd &>/dev/null; then
+        if sudo snap list steam &>/dev/null; then
+            info "Steam is already installed via Snap"
+            steam_installed=true
+        elif sudo snap install steam; then
+            info "Steam installed via Snap"
+            steam_installed=true
+        else
+            warn "Steam Snap installation failed; trying the native Arch package"
+        fi
+    else
+        warn "Snap is unavailable; trying the native Arch package for Steam"
+    fi
+
+    if ! $steam_installed; then
+        if sudo pacman -S --needed --noconfirm steam; then
+            info "Steam installed via the native Arch package"
+            steam_installed=true
+        else
+            warn "Native Steam package installation failed; trying Flatpak"
+        fi
+    fi
+
+    if ! $steam_installed; then
+        if flatpak info com.valvesoftware.Steam &>/dev/null; then
+            info "Steam is already installed via Flatpak"
+            steam_installed=true
+        elif sudo flatpak install -y flathub com.valvesoftware.Steam; then
+            info "Steam installed via Flatpak"
+            steam_installed=true
+        else
+            fail "Steam installation failed via Snap, native package and Flatpak"
+        fi
+    fi
 fi
 
 # Enable AUR support only when the replacement frontend is available.
