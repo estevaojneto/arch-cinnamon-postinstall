@@ -22,7 +22,7 @@ It is designed to be run as a normal user, not as root.
 ### Packages and applications
 
 **System utilities**
-- `base-devel`, `git`, `curl`, `unzip`, `pciutils`
+- `base-devel`, `git`, `curl`, `unzip`, `pciutils`, `pacman-contrib`
 - `gvfs`, `gvfs-mtp`, `gvfs-smb`, `gvfs-afc`
 - `ntfs-3g`, `gnome-keyring`
 - `xdg-utils`, `dconf`, `pavucontrol`, `xorg-xdpyinfo`, `xorg-xinput`
