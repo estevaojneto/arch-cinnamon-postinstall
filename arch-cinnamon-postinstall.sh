@@ -134,7 +134,7 @@ fi
 
 # --------------------------- base tooling ------------------------------------
 info "Installing build tools"
-pac_try base-devel git curl unzip pciutils
+pac_try base-devel git curl unzip pciutils pacman-contrib
 
 # ------------------------- printer support -----------------------------------
 info "Installing printer and network printer support"
